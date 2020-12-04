@@ -377,7 +377,7 @@ html
                 tr
                   td.email-masthead
                     a.f-fallback.email-masthead_name(href='https://enterprise.liquidintel.io')
-                      img(src="https://api.liquidintel.io/liquidintel_logo.png", alt="LiquidIntel Logo", height="60")
+                      img(src=`${process.env.SCHEMA}://${process.env.HOST}${process.env.PORT && `:${process.env.PORT}`}`+"/liquidintel_logo.png", alt="LiquidIntel Logo", height="60")
                       // h1.align-center Liquid Intel
                 // Email Body
                 tr

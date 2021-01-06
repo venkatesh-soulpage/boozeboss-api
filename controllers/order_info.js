@@ -10,8 +10,14 @@ import _ from "lodash";
 const postOrderInfo = async (req, res, next) => {
   try {
     const body = req.body.data;
-    // console.log(req.body, "PAYLOAD PASSED TO THE API");
+    const usertoken = req.headers.authorization;
+    const token = usertoken.split(" ");
+    const decoded = jwt.verify(token[1], process.env.SECRET_KEY);
+    for (let info of body) {
+      info.updated_by = decoded.id;
+    }
     const response = await models.OrderInfo.query().insert(body);
+<<<<<<< HEAD
     console.log(response, "RESPONSE");
     const IDs = [];
     for (let info of response) {
@@ -21,6 +27,9 @@ const postOrderInfo = async (req, res, next) => {
     return res
       .status(200)
       .send({ Status: true, insertedData: response, insertedIds: IDs });
+=======
+    return res.status(200).send({ Status: true, insertedData: response });
+>>>>>>> 15e125a5aeb3e9b01469d0def7f9935d89d704c6
   } catch (e) {
     console.log(e);
     return res.status(500).send({ Status: false, error: JSON.stringify(e) });

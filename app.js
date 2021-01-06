@@ -8,6 +8,9 @@ var bodyParser = require("body-parser");
 var cors = require("cors");
 var QRCode = require("qrcode");
 
+const fs = require("fs");
+const FILE_PATH = "stats.json";
+
 var indexRouter = require("./routes/index");
 var authRouter = require("./routes/auth");
 var accountsRouter = require("./routes/accounts");
@@ -46,6 +49,43 @@ app.use(
   })
 );
 
+const getRoute = (req) => {
+  const route = req.route ? req.route.path : ""; // check if the handler exist
+  const baseUrl = req.baseUrl ? req.baseUrl : ""; // adding the base url if the handler is a child of another handler
+
+  return route ? `${baseUrl === "/" ? "" : baseUrl}${route}` : "unknown route";
+};
+
+// read json object from file
+const readStats = () => {
+  let result = {};
+  try {
+    result = JSON.parse(fs.readFileSync(FILE_PATH));
+  } catch (err) {
+    console.error(err);
+  }
+  return result;
+};
+
+// dump json object to file
+const dumpStats = (stats) => {
+  try {
+    fs.writeFileSync(FILE_PATH, JSON.stringify(stats), { flag: "w+" });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    const stats = readStats();
+    const event = `${req.method} ${getRoute(req)} ${res.statusCode}`;
+    stats[event] = stats[event] ? stats[event] + 1 : 1;
+    dumpStats(stats);
+  });
+  next();
+});
+
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
@@ -56,6 +96,10 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+// app.get("/stats", (req, res) => {
+//   res.json(readStats());
+// });
 
 app.use("/", indexRouter);
 app.use("/api/auth", authRouter);
@@ -82,6 +126,10 @@ app.use("/api/outletlocations", outletLocationsRoute);
 app.use("/api/cart", cartRoute);
 app.use("/api/orderinfo", orderInfo);
 app.use("/api/statistics", statistics);
+
+// app.get("/stats/", (req, res) => {
+//   res.json(readStats());
+// });
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

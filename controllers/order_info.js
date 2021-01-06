@@ -12,27 +12,33 @@ const postOrderInfo = async (req, res, next) => {
     const body = req.body.data;
     // console.log(req.body, "PAYLOAD PASSED TO THE API");
     const response = await models.OrderInfo.query().insert(body);
-    // console.log(response, "RESPONSE");
-    return res.status(200).send({ Status: true, insertedData: response });
+    console.log(response, "RESPONSE");
+    const IDs = [];
+    for (let info of response) {
+      IDs.push(info.id);
+    }
+    console.log(IDs, "IDS FROM INSERTED DATA");
+    return res
+      .status(200)
+      .send({ Status: true, insertedData: response, insertedIds: IDs });
   } catch (e) {
     console.log(e);
-    return res.status(500).send({ Status: true, error: JSON.stringify(e) });
+    return res.status(500).send({ Status: false, error: JSON.stringify(e) });
   }
 };
 
 const getOrderInfo = async (req, res, next) => {
   try {
-    const { account_id } = req.params;
-    const response = await models.OrderInfo.query().where({
-      updated_by: account_id,
-      ordered: false,
-      billed: false,
-    });
-    // .first();
-    return res.status(200).send({ orders: response });
+    const { IDS } = req.body;
+    console.log(IDS, "IDS FROM FRONEND");
+    const response = await models.OrderInfo.query()
+      .withGraphFetched("[ordered_venue_product_id, ordered_event_product_id]")
+      .whereIn("id", IDS);
+    console.log(response, "RESPONSE FROM API");
+    return res.status(200).send({ Status: true, orders: response });
   } catch (e) {
     console.log(e);
-    return res.status(500).send({ Status: true, error: JSON.stringify(e) });
+    return res.status(500).send({ Status: false, error: JSON.stringify(e) });
   }
 };
 

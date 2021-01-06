@@ -47,7 +47,7 @@ import Cart from "./cart";
 import CartItem from "./cart_item";
 import OutletWaiter from "./outletwaiters";
 import OrderInfo from "./order_info";
-
+import Statistics from "./statistics";
 export default {
   Location,
   Account,
@@ -98,4 +98,5 @@ export default {
   CartItem,
   OutletWaiter,
   OrderInfo,
+  Statistics,
 };

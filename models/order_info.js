@@ -12,7 +12,7 @@ export default class OrderInfo extends Model {
         relation: Model.HasManyRelation,
         modelClass: models.OutletVenueMenu,
         join: {
-          from: "orderinfo.outletvenuemenu_id",
+          from: "ordersinfo.outletvenuemenu_id",
           to: "outletvenuemenus.id",
         },
       },
@@ -20,7 +20,7 @@ export default class OrderInfo extends Model {
         relation: Model.HasManyRelation,
         modelClass: models.OutletEventMenu,
         join: {
-          from: "orderinfo.outleteventmenu_id",
+          from: "ordersinfo.outleteventmenu_id",
           to: "outleteventmenus.id",
         },
       },
